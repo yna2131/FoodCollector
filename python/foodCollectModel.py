@@ -10,6 +10,13 @@ import math
 
 import numpy as np
 
+# ##constants:
+# WIDTH = 20
+# HEIGHT = 20
+# COUNT_FOOD = 47
+# NUM_EXPLORERS = 3
+# NUM_COLLECTORS = 2
+# STEPS = 1500
 
 
 # Agent Class
@@ -175,7 +182,8 @@ class FoodModel(Model):
         )
 
     def get_floor(self):
-        return self.floor.copy()
+        new_floor = self.floor.copy()
+        return new_floor.tolist()
 
     def place_food(self):
         if self.placed_food < self.count_food:
