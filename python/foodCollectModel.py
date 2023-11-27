@@ -9,6 +9,7 @@ from mesa.datacollection import DataCollector
 import math
 
 import numpy as np
+import pandas as pd
 
 # ##constants:
 # WIDTH = 20
@@ -20,7 +21,6 @@ import numpy as np
 
 
 # Agent Class
-## ExplorerAgent
 class ExplorerAgent(Agent):
     def __init__(self, id, model):
         super().__init__(id, model)
@@ -28,11 +28,9 @@ class ExplorerAgent(Agent):
 
     def step(self):
         if not self.model.hasStorage:
-            self.lookforstorage()
+            self.check_storage()
         else:
-            unfound_food = 47 - self.model.found_food
-            if unfound_food > 0:
-                self.lookforfood()
+            self.lookforfood()
 
     def move(self):
         neighbors = self.model.grid.get_neighborhood(self.pos, 
@@ -46,32 +44,18 @@ class ExplorerAgent(Agent):
             new_position = self.random.choice(is_possible)
             self.model.grid.move_agent(self, new_position)
 
-    def lookforstorage(self):
-        neighbors = self.model.grid.get_neighborhood(self.pos, 
-                                                        moore = True, 
-                                                        include_center = False
-        )
-
-        for neighbor in neighbors:
-            x, y = neighbor
-            if self.model.floor[x][y] == 10:
-                self.model.hasStorage = True
-                self.model.position_storage.append(neighbor)
-                break
+    def check_storage(self):
+        x,y = self.pos
+        if self.model.floor[x][y] == 10:
+            self.model.hasStorage = True
+            self.model.position_storage = (x, y)
         self.move()
     
     def lookforfood(self):
-        neighbors = self.model.grid.get_neighborhood(self.pos, 
-                                                        moore = True, 
-                                                        include_center = False
-        )
-
-        for neighbor in neighbors:
-            x, y = neighbor
-            if self.model.floor[x][y] > 0:
-                self.model.found_food += self.model.floor[x][y]
-                self.model.positions_food.append(neighbor)
-                break
+        x,y = self.pos
+        if self.model.floor[x][y] > 0 and self.model.floor[x][y] < 10:
+            if self.pos not in self.model.positions_food:
+                self.model.positions_food.append(self.pos)
         self.move()
 
 ## CollectorAgent
@@ -80,44 +64,23 @@ class CollectorAgent(Agent):
         super().__init__(id, model)
         self.random.seed(12345)
         self.hasFood = False
+        self.target = None
 
-    def pickup(self):
-        neighbors = self.model.grid.get_neighborhood(self.pos, 
-                                                     moore = True, 
-                                                     include_center = False
-        )
+    def shortest_distance(self, target_position):
+        x1, y1 = self.pos
+        x2, y2 = target_position
 
-        for neighbor in neighbors:
-            x, y = neighbor
-            if self.model.floor[x][y] > 0 and self.model.floor[x][y] < 10:
-                self.hasFood = True
-                self.model.floor[x][y] -= 1
-                if (x, y) in self.model.positions_food and self.model.floor[x][y] == 0:
-                    self.model.positions_food.remove((x, y))
-                break
+        # Manhattan distance
+        return abs(x2 - x1) + abs(y2 - y1)
+    
+    def getTarget(self):
+        distances = [self.shortest_distance(food) for food in self.model.positions_food]
+        if distances:
+            closests_food_index = distances.index(min(distances))
+            closest_food_pos = self.model.positions_food[closests_food_index]
+            self.target = closest_food_pos
 
-    def drop(self):
-        neighbors = self.model.grid.get_neighborhood(self.pos, 
-                                                     moore = True, 
-                                                     include_center = False
-        )
-
-        for neighbor in neighbors:
-            if neighbor == self.model.position_storage[0]:
-                self.hasFood = False
-                self.model.collected_food += 1
-
-    def step(self):
-        self.move()
-        if self.hasFood and self.model.hasStorage:
-            self.drop()
-        elif self.hasFood and not self.model.hasStorage:
-            self.move()
-        else:
-            self.pickup()
-
-    def move(self):
-        # We have to implement the shortest path movement instead of the random one
+    def random_move(self):
         neighbors = self.model.grid.get_neighborhood(self.pos, 
                                                      moore = True, 
                                                      include_center = False
@@ -128,6 +91,68 @@ class CollectorAgent(Agent):
         if is_possible:
             new_position = self.random.choice(is_possible)
             self.model.grid.move_agent(self, new_position)
+
+    def move(self):
+        x, y = self.pos
+        x2, y2 = self.target
+
+        dirx = x2 - x
+        diry = y2 - y
+
+        a = x
+        b = y
+        
+        if dirx > 0:
+            a = a + 1 
+        elif dirx < 0:
+            a = a - 1
+
+        if diry > 0:
+            b = b + 1
+        elif diry < 0:
+            b = b - 1
+
+        new_position = (a, b)
+                
+        if self.model.grid.is_cell_empty(new_position):
+            self.model.grid.move_agent(self, new_position)
+        else:
+            self.random_move()
+
+    def pickup(self):
+        x, y = self.pos
+        if self.model.floor[x][y] > 0 and self.model.floor[x][y] < 10:
+            if (x, y) in self.model.positions_food:
+                self.hasFood = True
+                self.target = self.model.position_storage
+                self.model.floor[x][y] -= 1
+                if (x, y) in self.model.positions_food and self.model.floor[x][y] == 0:
+                    self.model.positions_food.remove((x, y))
+
+    def drop(self):
+        self.hasFood = False
+        self.target = None
+        self.model.collected_food += 1
+
+    def step(self): 
+        if self.pos == self.target:
+            self.target = None
+
+        if self.hasFood:
+            if self.model.hasStorage:
+                if self.pos == self.model.position_storage:
+                    self.drop()
+                else:
+                    self.move()
+        else:
+            self.pickup()
+            if self.hasFood:
+                return
+            else:
+                if self.target != None:
+                    self.move()
+                else:
+                    self.getTarget()
 
 # Model Class
 class FoodModel(Model):
@@ -138,8 +163,7 @@ class FoodModel(Model):
         self.num_collectors = num_collectors
         self.count_food = count_food
         self.positions_food = []
-        self.position_storage = []
-        self.found_food = 0
+        self.position_storage = None
         self.collected_food = 0
         self.placed_food = 0
         self.step_count = 0
@@ -175,10 +199,10 @@ class FoodModel(Model):
                     if self.grid.is_cell_empty((x, y)):
                         unplaced = False
             self.grid.place_agent(agent, (x,y))
-
+            
         self.datacollector = DataCollector(
-            agent_reporters = {"hasFood": "hasFood", "hasStorage": "hasStorage"},
-            model_reporters = {"Floor": self.get_floor}
+            agent_reporters={"hasFood": "hasFood", "hasStorage": "hasStorage"},
+            model_reporters={"Floor": self.get_floor, "AgentPositions": self.get_agent_positions}
         )
 
     def get_floor(self):
@@ -201,6 +225,15 @@ class FoodModel(Model):
                             unplaced = False
                 self.floor[x][y] += 1
             self.placed_food += val
+
+    def get_agent_positions(self):
+        positions = np.zeros((self.grid.width, self.grid.height))
+
+        for agent in self.schedule.agents:
+            x, y = agent.pos
+            positions[x][y] = 1
+
+        return positions
 
     def step(self):
         self.step_count += 1
