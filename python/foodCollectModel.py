@@ -206,8 +206,8 @@ class FoodModel(Model):
         )
 
     def get_floor(self):
-        new_floor = self.floor.copy()
-        return new_floor.tolist()
+        return self.floor.copy().tolist()
+
 
     def place_food(self):
         if self.placed_food < self.count_food:
@@ -233,7 +233,8 @@ class FoodModel(Model):
             x, y = agent.pos
             positions[x][y] = 1
 
-        return positions
+        return positions.tolist() 
+
 
     def step(self):
         self.step_count += 1

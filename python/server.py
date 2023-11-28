@@ -21,8 +21,7 @@ class CustomServer(BaseHTTPRequestHandler):
            	
     def _run_simulation(self):
         model = FoodModel(
-            WIDTH, HEIGHT, COUNT_FOOD, NUM_EXPLORERS, NUM_COLLECTORS,
-        )
+            WIDTH, HEIGHT, NUM_EXPLORERS, NUM_COLLECTORS, COUNT_FOOD)
 
         for i in range(STEPS):
             if model.collected_food < 47:
@@ -30,15 +29,19 @@ class CustomServer(BaseHTTPRequestHandler):
             else:
                 break
 
-        data = model.datacollector.get_model_vars_dataframe().get("Floor")
-        #print (data)
-        data = list(data)
-        #print (data)
-        
-        response_data = data[:-1]
-        #print (response_data)
+        data = model.datacollector.get_model_vars_dataframe().to_dict(orient='records')
 
-        return json.dumps({"steps": len(data), "data": response_data}).encode()
+        # print ("antes de list")
+        # print (data)
+        # data = list(data)
+        # print ("despues de list")
+        # print (data)
+        
+        # response_data = data[:-1]
+        # print ("response_data")
+        # print (response_data)
+
+        return json.dumps({"steps": len(data), "data": data}).encode()
 
 
 
