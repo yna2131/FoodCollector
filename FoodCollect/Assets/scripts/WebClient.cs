@@ -10,51 +10,55 @@ using UnityEngine.Networking;
 
 public class WebClient : MonoBehaviour
 {
-    // IEnumerator - yield return
-    IEnumerator SendData(string data)
+    [System.Serializable]
+    public class Datum
     {
-        WWWForm form = new WWWForm();
-        form.AddField("bundle", "the data");
-        string url = "http://localhost:8585";
-        using (UnityWebRequest www = UnityWebRequest.Post(url, form))
+        public List<List<double>> Floor { get; set; }
+        public List<List<double>> AgentPositions { get; set; }
+    }
+    public class ModelResponse
+    {
+        // Define the structure of response data
+        public int steps { get; set; }
+        public List<Datum> data { get; set; } 
+
+    }
+
+    string url = "http://localhost:8585";
+    public IEnumerator GetData()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(url))
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(data);
-            www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-            www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-            //www.SetRequestHeader("Content-Type", "text/html");
+             // Set up a DownloadHandlerBuffer to store the response data
+            www.downloadHandler = new DownloadHandlerBuffer();
+
+           // Set the request header to indicate that the expected response is in JSON format 
             www.SetRequestHeader("Content-Type", "application/json");
 
+            // Send the GET request and wait for the response
             yield return www.SendWebRequest();          // Talk to Python
-            if(www.isNetworkError || www.isHttpError)
+
+            // Check if there was a connection error or protocol error
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
+                // Log the error and return
                 Debug.Log(www.error);
+                yield break;
             }
             else
             {
+            // Log the response data from the server
                 Debug.Log(www.downloadHandler.text);    // Answer from Python
-                Vector3 tPos = JsonUtility.FromJson<Vector3>(www.downloadHandler.text.Replace('\'', '\"'));
-                //Debug.Log("Form upload complete!");
-                Debug.Log(tPos);
+            
+            // Deserialize the JSON response into a ModelResponse object
+                ModelResponse res = JsonUtility.FromJson<ModelResponse>(www.downloadHandler.text);
+            
+            // Log the deserialized response object
+                // Debug.Log(res.steps);
+                // yield return res;
             }
         }
-
-    }
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        //string call = "What's up?";
-        Vector3 fakePos = new Vector3(3.44f, 0, -15.707f);
-        string json = EditorJsonUtility.ToJson(fakePos);
-        //StartCoroutine(SendData(call));
-        StartCoroutine(SendData(json));
-        // transform.localPosition
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
+
+
