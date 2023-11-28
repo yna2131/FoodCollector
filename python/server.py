@@ -29,17 +29,26 @@ class CustomServer(BaseHTTPRequestHandler):
             else:
                 break
 
-        data = model.datacollector.get_model_vars_dataframe().to_dict(orient='records')
+        data = model.datacollector.get_model_vars_dataframe().to_dict('records')
 
-        # print ("antes de list")
-        # print (data)
-        # data = list(data)
-        # print ("despues de list")
-        # print (data)
+        # floor = model.get_floor()
+        # agents = model.get_agent_positions()
+
+        for iter in range(len(data)):
+            flatFloor = []
+            for row in data[iter]['Floor']:
+                for col in row:
+                    flatFloor.append(col)
+            data[iter]['Floor'] = flatFloor
+
+            flatExplorers = []
+
+            for row in data[iter]['AgentPositions']:
+                for col in row:
+                    flatExplorers.append(col)
+            data[iter]['AgentPositions'] = flatExplorers
+
         
-        # response_data = data[:-1]
-        # print ("response_data")
-        # print (response_data)
 
         return json.dumps({"steps": len(data), "data": data}).encode()
 

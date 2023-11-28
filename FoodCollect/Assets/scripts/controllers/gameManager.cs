@@ -23,9 +23,8 @@ public class gameManager : MonoBehaviour
     private float timer;
 
     public float interval = 0.5f;
-
-    //public ModelResponse res { get; set; } // Public property to store the response
-
+    
+    //WebClient.ModelResponse res;
 
     // Start is called before the first frame update
     void Start()
@@ -40,16 +39,16 @@ public class gameManager : MonoBehaviour
 
     // void Update()
     // {
-    //     for (int i = 0; i < res.Floor.Count; i++)
+    //     for (int i = 0; i < res.data[0].Floor.Count; i++)
     //     {
-    //         for (int j = 0; j < res.Floor[i].Count; j++)
+    //         for (int j = 0; j < res.data[0].Floor[i].Count; j++)
     //         {
-    //             if (res.Floor[i][j] == 10)
+    //             if (res.data[0].Floor[i][j] == 10)
     //             {
     //                 Instantiate(storagePrefab, new Vector3(i, 0, j), Quaternion.identity);
     //             }
                     
-    //             else if (res.Floor[i][j] > 0 && res.Floor[i][j] < 10)
+    //             else if (res.data[0].Floor[i][j] > 0 && res.data[0].Floor[i][j] < 10)
     //             {
     //                 Instantiate(foodPrefab, new Vector3(i, 0, j), Quaternion.identity);
     //             }

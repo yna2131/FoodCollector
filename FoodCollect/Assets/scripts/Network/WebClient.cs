@@ -10,21 +10,8 @@ using UnityEngine.Networking;
 
 public class WebClient : MonoBehaviour
 {
-    [System.Serializable]
-    public class Datum
-    {
-        public List<List<double>> Floor { get; set; }
-        public List<List<double>> AgentPositions { get; set; }
-    }
-    public class ModelResponse
-    {
-        // Define the structure of response data
-        public int steps { get; set; }
-        public List<Datum> data { get; set; } 
-
-    }
     
-    public ModelResponse res { get; set; } // Public property to store the response
+    //public ModelResponse res { get; set; } // Public property to store the response
 
 
     string url = "http://localhost:8585";
@@ -58,9 +45,32 @@ public class WebClient : MonoBehaviour
                 
             
             // Log the deserialized response object
-                Debug.Log(res.ToString());
+                Debug.Log("Result:");
+                Debug.Log(www.downloadHandler.text);
+                // Debug.Log("Steps:");
+                // Debug.Log(res.steps);
+                // Debug.Log("Data:");
+                // Debug.Log(res.data);
+                // Debug.Log("Floor:");
                 
-                Debug.Log(res.data);
+                for (int i = 0; i < 1; i++)
+                {
+                    Datum data = res.data[i];
+                    string dataString = $"Datum details: Property1=[{string.Join(", ", data.Floor)}], Property2=[{string.Join(", ", data.AgentPositions)}]";
+                    Debug.Log(dataString);
+
+                    Debug.Log("data:");
+                    // Debug.Log("Floor:");
+                    // foreach (int row in data.Floor)
+                    // {
+                    //     Debug.Log(row);
+
+                    //     // foreach (int col in row)
+                    //     // {
+                    //     //     Debug.Log(col);
+                    //     // }
+                    // }
+                }
                 yield return res;
                 
             }
