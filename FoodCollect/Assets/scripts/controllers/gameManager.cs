@@ -1,13 +1,14 @@
 using UnityEngine; //Para la clase JsonUtility
 using System.Net;
 using System.IO;
-using System;
+using System.Collections;
 
 
 
 public class gameManager : MonoBehaviour
 {
     WebClient wc;
+    ModelResponse res;
 
     public GameObject storagePrefab;
 
@@ -17,7 +18,7 @@ public class gameManager : MonoBehaviour
 
     public GameObject explorerAgentPrefab;
 
-    public static Action OnMinuteChanged;
+    // public static Action OnMinuteChanged;
 
     private float minuteToRealTime = 0.5f;
     private float timer;
@@ -32,29 +33,53 @@ public class gameManager : MonoBehaviour
         timer = minuteToRealTime;
 
         wc = gameObject.AddComponent<WebClient>();
-        //Debug.Log("Wc:" + wc);
-        
-        StartCoroutine(wc.GetData());
+        Debug.Log("WebClient added to " + gameObject.name);
+        Debug.Log("WebClient object data: " + wc.ToString());
+
+        // Use StartCoroutine to run the coroutine in the background
+        StartCoroutine(GetDataAndAssignResponse());
     }
 
-    // void Update()
-    // {
-    //     for (int i = 0; i < res.data[0].Floor.Count; i++)
-    //     {
-    //         for (int j = 0; j < res.data[0].Floor[i].Count; j++)
-    //         {
-    //             if (res.data[0].Floor[i][j] == 10)
-    //             {
-    //                 Instantiate(storagePrefab, new Vector3(i, 0, j), Quaternion.identity);
-    //             }
-                    
-    //             else if (res.data[0].Floor[i][j] > 0 && res.data[0].Floor[i][j] < 10)
-    //             {
-    //                 Instantiate(foodPrefab, new Vector3(i, 0, j), Quaternion.identity);
-    //             }
-                    
-    //         }}
-    // }
+    private IEnumerator GetDataAndAssignResponse()
+    {
+        yield return wc.GetData();
+
+        res = wc.GetResponse();
+        Debug.Log(res);
+
+        if (res != null && res.data != null && res.data.Count > 0)
+        {
+            // Your logic for instantiating objects based on response data
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; j < 20; j++)
+                {
+                    Debug.Log(res.data[0].Floor);
+
+                    int a = i * 20 + j;
+                    if (res.data[0].Floor != null && a < res.data[0].Floor.Count)
+                    {
+                        if (res.data[0].Floor[a] == 10)
+                        {
+                            Instantiate(storagePrefab, new Vector3(i, 0, j), Quaternion.identity);
+                        }
+                        else if (res.data[0].Floor[a] > 0 && res.data[0].Floor[a] < 10)
+                        {
+                            Instantiate(foodPrefab, new Vector3(i, 0, j), Quaternion.identity);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("Response or its properties are null or empty.");
+        }
+    }
+
+    void Update()
+    {}
+        
     
     
 
