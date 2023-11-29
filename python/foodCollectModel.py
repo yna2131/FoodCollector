@@ -66,6 +66,7 @@ class CollectorAgent(Agent):
         self.random.seed(12345)
         self.hasFood = False
         self.target = None
+        self.type = 2
 
     def shortest_distance(self, target_position):
         x1, y1 = self.pos
