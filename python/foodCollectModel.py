@@ -25,6 +25,7 @@ class ExplorerAgent(Agent):
     def __init__(self, id, model):
         super().__init__(id, model)
         self.random.seed(12345)
+        self.type = 1
 
     def step(self):
         if not self.model.hasStorage:
@@ -167,6 +168,7 @@ class FoodModel(Model):
         self.collected_food = 0
         self.placed_food = 0
         self.step_count = 0
+        self.type = 2
 
         self.schedule = RandomActivation(self)
         self.grid = SingleGrid(width, height, torus = False)
@@ -231,7 +233,7 @@ class FoodModel(Model):
 
         for agent in self.schedule.agents:
             x, y = agent.pos
-            positions[x][y] = 1
+            positions[x][y] = agent.type
 
         return positions.tolist() 
 
