@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -10527,13 +10527,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.21515287, y: 0, z: -0, w: -0.97658044}
-  m_LocalPosition: {x: -19.76, y: 16.61, z: -20.19}
+  m_LocalRotation: {x: -0.00012414939, y: -0.87195915, z: 0.4895664, w: 0.0034810782}
+  m_LocalPosition: {x: 9.69, y: 16.7, z: 22.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 24.849, y: 360, z: 0}
+  m_LocalEulerAnglesHint: {x: 58.623, y: 540.681, z: 0.399}
 --- !u!1001 &967416506
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15339,8 +15339,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   storagePrefab: {fileID: 4123276510376205671, guid: 8cbf85a57b85d304bbb153fb448650d8, type: 3}
   foodPrefab: {fileID: 999759748974178476, guid: ab947aaa9f11cec40b71a1fcd4ab20a5, type: 3}
+  collectorAgentPrefab: {fileID: 873531700701352353, guid: 28d0a30d6aed6fc4c8ca473413f70c24, type: 3}
   explorerAgentPrefab: {fileID: 7840113173070322414, guid: 57edd373f7ce43a49b01ec01c241c90d, type: 3}
-  interval: 0.5
+  interval: 0.3
 --- !u!4 &1364766356
 Transform:
   m_ObjectHideFlags: 0
@@ -22767,7 +22768,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3030836512540638383}
