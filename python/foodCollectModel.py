@@ -25,6 +25,7 @@ class ExplorerAgent(Agent):
     def __init__(self, id, model):
         super().__init__(id, model)
         self.random.seed(12345)
+        self.type = 1
 
     def step(self):
         if not self.model.hasStorage:
@@ -65,6 +66,7 @@ class CollectorAgent(Agent):
         self.random.seed(12345)
         self.hasFood = False
         self.target = None
+        self.type = 2
 
     def shortest_distance(self, target_position):
         x1, y1 = self.pos
@@ -231,7 +233,7 @@ class FoodModel(Model):
 
         for agent in self.schedule.agents:
             x, y = agent.pos
-            positions[x][y] = 1
+            positions[x][y] = agent.type
 
         return positions.tolist() 
 
