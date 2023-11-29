@@ -3,7 +3,11 @@ guid: 5e0678d24a05ecb40a8032acbc855c49
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - storagePrefab: {fileID: 4123276510376205671, guid: 8cbf85a57b85d304bbb153fb448650d8, type: 3}
+  - foodPrefab: {fileID: 999759748974178476, guid: ab947aaa9f11cec40b71a1fcd4ab20a5, type: 3}
+  - collectorAgentPrefab: {fileID: 6891580169314388076, guid: 66ae442726d1cf4428dacb34edd61ac4, type: 3}
+  - explorerAgentPrefab: {fileID: 7840113173070322414, guid: 57edd373f7ce43a49b01ec01c241c90d, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

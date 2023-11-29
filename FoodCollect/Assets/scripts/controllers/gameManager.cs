@@ -14,7 +14,7 @@ public class gameManager : MonoBehaviour
 
     public GameObject foodPrefab;
 
-    public GameObject collectorAgentPrefab;
+    //public GameObject collectorAgentPrefab;
 
     public GameObject explorerAgentPrefab;
 
@@ -33,10 +33,6 @@ public class gameManager : MonoBehaviour
         timer = minuteToRealTime;
 
         wc = gameObject.AddComponent<WebClient>();
-        Debug.Log("WebClient added to " + gameObject.name);
-        Debug.Log("WebClient object data: " + wc.ToString());
-
-        // Use StartCoroutine to run the coroutine in the background
         StartCoroutine(GetDataAndAssignResponse());
     }
 
@@ -45,7 +41,6 @@ public class gameManager : MonoBehaviour
         yield return wc.GetData();
 
         res = wc.GetResponse();
-        Debug.Log(res);
 
         if (res != null && res.data != null && res.data.Count > 0)
         {
@@ -54,8 +49,6 @@ public class gameManager : MonoBehaviour
             {
                 for (int j = 0; j < 20; j++)
                 {
-                    Debug.Log(res.data[0].Floor);
-
                     int a = i * 20 + j;
                     if (res.data[0].Floor != null && a < res.data[0].Floor.Count)
                     {
@@ -63,13 +56,25 @@ public class gameManager : MonoBehaviour
                         {
                             Instantiate(storagePrefab, new Vector3(i, 0, j), Quaternion.identity);
                         }
-                        else if (res.data[0].Floor[a] > 0 && res.data[0].Floor[a] < 10)
+
+                        float floorValue = res.data[0].Floor[a];
+                        // Debug.Log("Floor[" + a + "] = " + floorValue);
+
+                        if (Mathf.Approximately(floorValue, 1.0f))
                         {
-                            Instantiate(foodPrefab, new Vector3(i, 0, j), Quaternion.identity);
+                            // Debug.Log("Instantiate food 123");
+                            Instantiate(foodPrefab, new Vector3(i, 2, j), Quaternion.identity);
                         }
+                    }
+                    foreach (var agent in res.data[0].AgentPositions)
+                    {
+                        Debug.Log("Agent: " + agent);
+                        Instantiate(explorerAgentPrefab, new Vector3(i, 2, j), Quaternion.identity);
                     }
                 }
             }
+
+            
         }
         else
         {
